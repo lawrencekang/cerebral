@@ -1,21 +1,23 @@
-import { boundSetSearchResult, boundSetMapBounds } from './actionCreators';
+import thunkMiddleware from 'redux-thunk'
+import { createStore, applyMiddleware } from 'redux'
 
-const mapStateToProps = state => {
-    console.log("MAPPING STATE")
-    return {
-        mapBounds: state.mapBounds,
-        searchResults: state.searchResults
-    }
-}
+import chatReducer from './reducer'
+import { composeWithDevTools } from 'redux-devtools-extension';
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-    console.log("MAPPING DISPATCH")
-    return {
-        boundSetSearchResult, boundSetMapBounds
-    }
-}
 
-export {
-    mapDispatchToProps,
-    mapStateToProps
-}
+export default function configureStore() {
+  const store = createStore(
+    chatReducer,
+    composeWithDevTools(
+      applyMiddleware(
+        thunkMiddleware, // lets us dispatch() functions
+      )
+    ),
+    
+  )
+  
+  return store
+}  
+
+
+

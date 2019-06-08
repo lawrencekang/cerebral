@@ -1,124 +1,60 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import GoogleMapReact from 'google-map-react';
 import { createStore } from 'redux';
-import mapFunctions from './store/reducers';
-import { setSearchResult } from './store/actionCreators';
 import { Provider, connect } from 'react-redux';
-import { mapStateToProps, mapDispatchToProps } from './store/index'
+// import { mapStateToProps, mapDispatchToProps } from './store/index'
+import chatReducer from './store/reducer';
+import PropTypes from 'prop-types';
+import { getQuestions } from './store/actions'
+import configureStore from './store/index';
 
-const store = createStore(mapFunctions, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
-// for logging purposes
-const unsubscribe = store.subscribe(() => console.log(store.getState()))
+const store = configureStore();
 
-class SearchBox extends React.Component {
-  constructor(props){
-    super(props);
+store.dispatch(getQuestions());
 
-    this.onPlacesChanged = this.onPlacesChanged.bind(this);
-  }
-  render() {
-    return <input id='autocomplete' ref='input' {...this.props} type='text'/>;
-  }
+const ChatWindow = message => (
+  <div>{message}</div>
+)
 
-  onPlacesChanged() {
-    if (this.props.onPlacesChanged) {
-      this.props.onPlacesChanged(this.searchBox.getPlaces());
-    } else {
-      console.log("PLACES", this.searchBox.getPlaces());
-    }
+const ChatInput = ({handleInput, value}) => (
+  <div>
+    <input type="text" value={value} onChange={(event)=>handleInput(event.target.value)}/>
+  </div>
+)
 
-  }
-  componentDidMount() {
-    var input = ReactDOM.findDOMNode(this.refs.input);
-    this.searchBox = new google.maps.places.SearchBox(input);
-    this.searchBox.addListener('places_changed', this.onPlacesChanged);
-  }
-  componentWillUnmount() {
-    // https://developers.google.com/maps/documentation/javascript/events#removing
-    google.maps.event.clearInstanceListeners(this.searchBox);
-  }
+ChatInput.propTypes = {
+  handleInput: PropTypes.func,
+  value: PropTypes.string
 }
 
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
- 
-
-class MapApp extends Component {
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      center: {
-        lat: 37.794100,
-        lng: -122.277470
-      },
-      zoom: 11
-    }
-  }
-
-  
- 
-  render() {
-    return (
-      // Important! Always set the container height explicitly
-      <div style={{ height: '250px', width: '100%' }}>
-        <GoogleMapReact
-          bootstrapURLKeys={{ key: 'AIzaSyB2XVrEfHWuqP96HePO6IoWEOA59eFdPtE' }}
-          defaultCenter={this.state.center}
-          defaultZoom={this.state.zoom}
-          yesIWantToUseGoogleMapApiInternals
-          onGoogleApiLoaded={({ map, maps }) => this.props.handleMapsApi(map,maps)}
-        >
-          <AnyReactComponent
-            lat={37.794100}
-            lng={-122.277470}
-            text={'Hawk & Pony!'}
-          />
-        </GoogleMapReact>
-      </div>
-    );
-  }
+ChatInput.defaultProps = {
+  handleInput: (value) => console.info(value)
 }
 
- MapApp = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(MapApp)
 
-class Landing extends React.Component {
+// class ChatInput extends React.Component {
+//   constructor(props){
+//     super(props);
+//   }
+//   render() {
+//     return <input id='chat-input' ref='input' {...this.props} type='text'/>;
+//   }
+// }
 
-  constructor(props) {
-    super(props);
-  }
+// class ChatInput extends React.Component {
+//   constructor(props){
+//     super(props);
+//   }
+//   render() {
+//     return <input id='chat-input' ref='input' {...this.props} type='text'/>;
+//   }
+// }
 
-  handleMapsApi(map, maps) {
-    console.log("GOT THE MAP", map)
-  }
-
-  componentDidMount(){
-    console.log(this.props);
-  }
-  render() {
-      return <div>
-          <MapApp
-            handleMapsApi={this.handleMapsApi}
-            />
-          <SearchBox
-            
-          />
-      </div>;
-  }
-}
-
-Landing = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Landing)
 
 ReactDOM.render(
-  <Provider store={store}>
-    <Landing/>
-    </Provider>,
+  // <Provider store={store}>
+    <ChatInput/>,
+    // </Provider>,
   document.getElementById('react')
-  );
+);
