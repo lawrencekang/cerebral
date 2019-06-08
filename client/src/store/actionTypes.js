@@ -1,0 +1,2 @@
+export const SET_SEARCH_RESULTS = 'SET_SEARCH_RESULT';
+export const SET_MAP_BOUNDS = 'SET_MAP_BOUNDS';
