@@ -1,38 +1,36 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
-import { Provider, connect } from 'react-redux';
-import chatReducer from './store/reducer';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
+import { Provider, connect } from 'react-redux'
+import configureStore from './store/index'
+import ChatWindow from './components/ChatWindow.jsx'
+import ChatBar from './components/ChatBar.jsx'
 import { getQuestions } from './store/actions'
-import configureStore from './store/index';
-import VisibleChatWindow from './components/ChatWindow.jsx';
 
 const store = configureStore();
 
-// store.dispatch(getQuestions());
+class ChatWrapper extends React.Component {
+  constructor(props){
+    super(props);
+  }
+  componentDidMount() {
+    store.dispatch(getQuestions())
+  }
+  render() {
+    return (
+      <React.Fragment>
+        <ChatWindow/>
+        <ChatBar/>
+      </React.Fragment>
+    )
+  }
+}
 
-
-// const ChatInput = ({handleInput, value}) => (
-//   <div>
-//     <input type="text" value={value} onChange={(event)=>handleInput(event.target.value)}/>
-//   </div>
-// )
-
-// ChatInput.propTypes = {
-//   handleInput: PropTypes.func,
-//   value: PropTypes.string
-// }
-
-// ChatInput.defaultProps = {
-//   handleInput: (value) => console.info(value)
-// }
-
-
+ChatWrapper = connect(null, null)(ChatWrapper)
 
 ReactDOM.render(
   <Provider store={store}>
-    <VisibleChatWindow/>
+    <ChatWrapper>
+    </ChatWrapper>
   </Provider>,
   document.getElementById('react')
 );

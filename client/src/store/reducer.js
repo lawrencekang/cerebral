@@ -2,12 +2,9 @@ import * as actionTypes from './actionTypes';
 
 const initialState = {
   questions: [],
-  activeQuestion: null,
-  conversation: [{
-    text:'hello',
-    speaker: 'me',
-    timestamp: new Date().toDateString()
-  }],
+  activeQuestionIndex: null,
+  chatInput: '',
+  conversation: [],
   user: {
     name: null,
     type: 'user'
@@ -20,13 +17,13 @@ const initialState = {
 
 export default function chatReducer(state = initialState, action) {
   switch (action.type) {
+    case actionTypes.SET_ACTIVE_QUESTION_INDEX:
+      return Object.assign({}, state, {
+        activeQuestionIndex: action.activeQuestionIndex
+      })
     case actionTypes.RECEIVE_QUESTIONS:
       return Object.assign({}, state, {
         questions: action.questions
-      })
-    case actionTypes.SET_ACTIVE_QUESTION:
-      return Object.assign({}, state, {
-        activeQuestion: action.questionNumber
       })
     case actionTypes.APPEND_TO_CONVERSATION:
       return Object.assign({}, state, {
@@ -38,6 +35,21 @@ export default function chatReducer(state = initialState, action) {
             timestamp: action.timestamp
           }
         ]
+      })
+    case actionTypes.SET_CHAT_INPUT:
+      return Object.assign({}, state, {
+        chatInput: action.chatInput
+      })
+    case actionTypes.SET_ANSWER_ON_QUESTION:
+      return Object.assign({}, state, {
+        questions: state.questions.map((question, index) => {
+          if (index === state.activeQuestionIndex) {
+            return Object.assign({}, question, {
+              answer: state.chatInput
+            })
+          }
+          return question
+        })
       })
     default:
       return state

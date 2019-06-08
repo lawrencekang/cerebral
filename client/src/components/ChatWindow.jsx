@@ -8,7 +8,7 @@ const mapStateToProps = state => {
   }
 }
 
-const ChatWindow = ({conversation}) => (
+let ChatWindow = ({conversation}) => (
   <div>
     {conversation.map((statement, index) => (
       <div key={index}>
@@ -31,6 +31,6 @@ ChatWindow.propTypes = {
   )
 }
 
-const VisibleChatWindow = connect(mapStateToProps, null)(ChatWindow)
+ChatWindow = connect(mapStateToProps, null)(ChatWindow)
 
-export default VisibleChatWindow
+export default ChatWindow
