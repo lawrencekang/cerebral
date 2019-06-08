@@ -1,12 +1,13 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes'
 
+const WPM = 40 // used to set delay on doctor 'typing'
 
 function nextQuestion(activeQuestionIndex) {
   return (dispatch, getState) => {
     let state = getState()
     let activeQuestion = state.questions[activeQuestionIndex]
-    dispatch(appendToConversation(state.doctor.name, activeQuestion.question, null))
+    dispatch(delayedAppend(state.doctor.name, activeQuestion.question, null))
   }
 }
 
@@ -31,96 +32,146 @@ function receiveQuestions(questions) {
 }
 
 function updateInput(inputValue) {
-  console.log("UPDATEINPUTETETET", inputValue);
   return {
     type: actionTypes.SET_CHAT_INPUT,
     chatInput: inputValue
   }
 }
 
-function appendToConversation(speaker, text, timestamp) {
+function delayedAppend(speaker, text) {
+  return (dispatch, state) => {
+    setTimeout(function() {
+      dispatch(appendToConversation(speaker, text))
+    }, 1000)
+  }
+}
+
+function appendToConversation(speaker, text) {
+  // to mimic actual typing times, set a delay for a time based on the length of the response.
+  // let words = text.split(" ").length
+  // let delay = words/WPM * 60 * 1000
+
   return {
     type: actionTypes.APPEND_TO_CONVERSATION,
     speaker,
     text,
-    timestamp
+    timestamp: new Date().toDateString()
   }
+
+  // console.log("APPENDING?");
+  // setTimeout(function() {
+    
+  // }, Math.floor(math))
+
+
+  
 }
 
 function getPath(state) {
-  // debugger;
   let paths = state.questions[state.activeQuestionIndex].paths
   let pathType = Array.isArray(paths) ? 'array' : typeof paths
   switch (pathType) {
     case 'undefined':
+      // not sure if this is ever used
       return undefined
     case 'number':
       return paths > 0 ? paths : 0
     case 'object':
-      return paths[state.chatInput] > 0 ? paths[state.chatInput] : 0
+      const formattedInput = state.chatInput.toLowerCase()
+      return paths[formattedInput] > 0 ? paths[formattedInput] : 0
   }
 }
 
 /**
- * validAnswer() returns an object based on whether the current chatInput
+ * validAnswer() returns a boolean based on whether the current chatInput
  * passes the validation required in the current activeQuestion
  */
 function validAnswer(state) {
   //  handle the case where we're using the "-1" question index
-  let activeQuestionIndex = state.activeQuestionIndex > 0 ? state.activeQuestionIndex : 0;
-  let activeQuestion = state.questions[activeQuestionIndex]
+  // let activeQuestionIndex = state.activeQuestionIndex > 0 ? state.activeQuestionIndex : 0;
+  let activeQuestion = state.questions[state.activeQuestionIndex]
   let currentInput = state.chatInput
   let validation = activeQuestion.validation;
   const validationType = Array.isArray(validation) ? 'array' : typeof validation
   
   switch (validationType) {
     case 'array':
-      console.log("ARRAY")
       if (validation.indexOf(currentInput.toLowerCase()) > -1) {
         return true
       } else {
         return false
       } 
     case 'string':
-        console.log("STRING")
       let regexTest = RegExp(validation);
-      console.log(regexTest.test(currentInput))
       if (regexTest.test(currentInput)){
         return true
       } else {
         return false
       }
     case 'boolean':
-        console.log("BOOL")
-      return true
+      return validation ? validation : undefined // using undefined for terminal validation
   }
 }
 
-function invalidAnswer() {
+function getHelperPrompt(state) {
+  const activeQuestion = state.questions[state.activeQuestionIndex]
+  const validation = activeQuestion.validation
+  const validationType = Array.isArray(validation) ? 'array' : typeof validation
+  const randomInvalidPromptIndex = Math.floor(Math.random() * Math.floor(state.invalidAnswerPrompts.length))
+  const randomPrompt = state.invalidAnswerPrompts[randomInvalidPromptIndex]
+  switch (validationType) {
+    case 'array':
+      return `${randomPrompt}  Please answer "${validation.join('," or "')}."`
+    case 'string':
+      if (activeQuestion.question.indexOf('email') > -1) {
+        return `I was looking for an email address, can you check the format and try again?`
+      } else if (activeQuestion.question.indexOf('born') > -1) {
+        return `${randomPrompt}.  Can you format your answer as MM/DD/YYYY?`
+      } else if (activeQuestion.question.indexOf('password') > -1) {
+        return `Your password should be at least six characters in length.`
+      }
+  } 
 
 }
 
 function validateInput(timestamp) {
-  return (dispatch, getState) => {
-    let state = getState()
 
-    dispatch(appendToConversation(state.user.name, state.chatInput, timestamp))
-    
-
-    if (validAnswer(state)) {
-      dispatch(setAnswerOnQuestion())
-      dispatch(updateInput(''))
-      console.log("ANSEWR WAS VALID?")
-      let path = getPath(state);
-      console.log("PATH", path);
-      if (path != undefined) {
-        dispatch(setActiveQuestionIndex(path))
-        dispatch(nextQuestion(path))
+    return (dispatch, getState) => {
+      let state = getState()
+      dispatch(appendToConversation(state.user.name, state.chatInput, timestamp))
+      const answerIsValid = validAnswer(state)
+      if (answerIsValid === true) {
+        dispatch(setAnswerOnQuestion())
+        dispatch(updateInput(''))
+        let path = getPath(state);
+        if (path != undefined) {
+          dispatch(setActiveQuestionIndex(path))
+          dispatch(nextQuestion(path))
+        } else {
+          // TODO: handle endstate
+          debugger;
+        }
+      } else if (answerIsValid === false) {
+          // Invalid answer
+          const helperPrompt = getHelperPrompt(state)
+          dispatch(appendToConversation(state.doctor.name, helperPrompt, new Date().toDateString()))
+          dispatch(updateInput(''))
       } else {
-        // TODO: handle endstate
+          // handle terminal case
       }
-      
     }
+
+}
+
+function disableSubmit() {
+  return {
+    type: actionTypes.DISABLE_SUBMIT
+  }
+}
+
+function enableSubmit() {
+  return {
+    type: actionTypes.ENABLE_SUBMIT
   }
 }
 
@@ -139,6 +190,8 @@ function getQuestions() {
 }
 
 export {
+  disableSubmit,
+  enableSubmit,
   getQuestions,
   updateInput,
   validateInput

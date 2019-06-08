@@ -12,7 +12,13 @@ const initialState = {
   doctor: {
     name: 'Dr. Frontier',
     type: 'doctor'
-  }
+  },
+  invalidAnswerPrompts: [
+    `I didn't quite get that.`,
+    `I'm not sure about that.`,
+    `Can you try again?`,
+    `Try your answer again.`
+  ]
 }
 
 export default function chatReducer(state = initialState, action) {

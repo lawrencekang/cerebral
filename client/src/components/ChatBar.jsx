@@ -1,8 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { updateInput } from '../store/actions'
-import { validateInput } from '../store/actions'
+import { disableSubmit, enableSubmit, updateInput, validateInput } from '../store/actions'
 
 const mapChatInputState = state => {
   return {
@@ -13,12 +12,10 @@ const mapChatInputState = state => {
 const mapChatInputDispatch = dispatch => {
   return {
     handleInput: inputValue => {
-      console.log("CHANGE", inputValue);;
       dispatch(updateInput(inputValue))},
     handleKeyPress: event => {
-      console.log("KEY", event.key);
       if (event.key=="Enter") {
-        console.log("HERE")
+        dispatch(disableSubmit())
         dispatch(validateInput(null))
       }
     }
