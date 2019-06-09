@@ -3,12 +3,17 @@ import * as actionTypes from './actionTypes'
 
 const WPM = 60 // used to set delay on doctor 'typing'
 
+// Simple action creators
 function nextQuestion(activeQuestionIndex) {
   return (dispatch, getState) => {
     dispatch(setAgentTyping(true))
     let state = getState()
+    let terminal = false;
     let activeQuestion = state.questions[activeQuestionIndex]
-    dispatch(delayedAppend(state.agent, activeQuestion.question))
+    if (activeQuestion.paths == undefined) {
+      terminal = true;
+    }
+    dispatch(delayedAppend(state.agent, activeQuestion.question, terminal))
   }
 }
 
@@ -39,7 +44,28 @@ function updateInput(inputValue) {
   }
 }
 
-function delayedAppend(speaker, text) {
+function setAgentTyping(value){
+  return {
+    type: actionTypes.SET_AGENT_TYPING,
+    value
+  }
+}
+
+function disableSubmit() {
+  return {
+    type: actionTypes.DISABLE_SUBMIT
+  }
+}
+
+function enableSubmit() {
+  return {
+    type: actionTypes.ENABLE_SUBMIT
+  }
+}
+
+// Thunks
+
+function delayedAppend(speaker, text, terminal) {
   // to mimic actual typing times, set a delay for a time based on the length of the response.
   let delay = 1000;
   if (!Array.isArray(text)) {
@@ -49,8 +75,10 @@ function delayedAppend(speaker, text) {
   return (dispatch) => {
     setTimeout(function() {
       dispatch(setAgentTyping(false));
-      dispatch(enableSubmit());
       dispatch(appendToConversation(speaker, text))
+      if (!terminal) {
+        dispatch(enableSubmit());
+      }
     }, delay)
   }
 }
@@ -96,20 +124,13 @@ function getPath(state, chatInput) {
   }
 }
 
-function setAgentTyping(value){
-  return {
-    type: actionTypes.SET_AGENT_TYPING,
-    value
-  }
-}
-
 /**
  * validAnswer() returns a boolean based on whether the current chatInput
  * passes the validation required in the current activeQuestion
+ * TODO: replace special characters (e.g. punctuation) when validating against string values.
  */
 function validAnswer(state) {
   //  handle the case where we're using the "-1" question index
-  // let activeQuestionIndex = state.activeQuestionIndex > 0 ? state.activeQuestionIndex : 0;
   let activeQuestion = state.questions[state.activeQuestionIndex]
   let currentInput = state.chatInput
   let validation = activeQuestion.validation;
@@ -147,7 +168,7 @@ function getHelperPrompt(state) {
       if (activeQuestion.question.indexOf('email') > -1) {
         return `I was looking for an email address, can you check the format and try again?`
       } else if (activeQuestion.question.indexOf('born') > -1) {
-        return `${randomPrompt}.  Can you format your answer as MM/DD/YYYY?`
+        return `${randomPrompt}  Format your answer as MM/DD/YYYY.`
       } else if (activeQuestion.question.indexOf('password') > -1) {
         return `Your password should be at least six characters in length.`
       }
@@ -165,12 +186,12 @@ function agentResponse(answerIsValid, chatInput){
         dispatch(nextQuestion(path))
       } 
     } else if (answerIsValid === false) {
-        // Invalid answer
+        // Invalid answer, prompt user with hints
         const helperPrompt = getHelperPrompt(state)
         dispatch(appendToConversation(state.agent, helperPrompt))
         dispatch(enableSubmit())
         dispatch(setAgentTyping(false))
-    } 
+    }
   }
 }
 
@@ -193,18 +214,6 @@ function validateInput(obscureText) {
     setTimeout(()=>{
       dispatch(agentResponse(answerIsValid, chatInput))
     }, Math.floor(Math.random() * Math.floor(1.5, 4) * 1000))
-  }
-}
-
-function disableSubmit() {
-  return {
-    type: actionTypes.DISABLE_SUBMIT
-  }
-}
-
-function enableSubmit() {
-  return {
-    type: actionTypes.ENABLE_SUBMIT
   }
 }
 

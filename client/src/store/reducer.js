@@ -17,7 +17,7 @@ const initialState = {
   },
   invalidAnswerPrompts: [
     `I didn't quite get that.`,
-    `I'm not sure about that.`,
+    `I'm not sure sure I got that.`,
     `Can you try again?`,
     `Try your answer again.`
   ]
