@@ -5,6 +5,8 @@ const initialState = {
   activeQuestionIndex: null,
   chatInput: '',
   conversation: [],
+  agentTyping: false,
+  submitDisabled: true,
   user: {
     name: null,
     type: 'user'
@@ -38,7 +40,8 @@ export default function chatReducer(state = initialState, action) {
           {
             speaker: action.speaker,
             text: action.text,
-            timestamp: action.timestamp
+            timestamp: action.timestamp,
+            answers: action.answers
           }
         ]
       })
@@ -56,6 +59,18 @@ export default function chatReducer(state = initialState, action) {
           }
           return question
         })
+      })
+    case actionTypes.SET_AGENT_TYPING:
+      return Object.assign({}, state, {
+        agentTyping: action.value
+      })
+    case actionTypes.ENABLE_SUBMIT:
+      return Object.assign({}, state, {
+        submitDisabled: false
+      })
+    case actionTypes.DISABLE_SUBMIT:
+      return Object.assign({}, state, {
+        submitDisabled: true
       })
     default:
       return state

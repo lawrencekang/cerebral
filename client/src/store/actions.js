@@ -1,10 +1,11 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes'
 
-const WPM = 40 // used to set delay on doctor 'typing'
+const WPM = 60 // used to set delay on doctor 'typing'
 
 function nextQuestion(activeQuestionIndex) {
   return (dispatch, getState) => {
+    dispatch(setAgentTyping(true))
     let state = getState()
     let activeQuestion = state.questions[activeQuestionIndex]
     dispatch(delayedAppend(state.doctor.name, activeQuestion.question, null))
@@ -39,35 +40,36 @@ function updateInput(inputValue) {
 }
 
 function delayedAppend(speaker, text) {
-  return (dispatch, state) => {
+  // to mimic actual typing times, set a delay for a time based on the length of the response.
+  let delay = 1000;
+  if (!Array.isArray(text)) {
+    let words = text.split(" ").length
+    delay = words/WPM * 250 * 60
+  }
+  return (dispatch) => {
     setTimeout(function() {
+      dispatch(setAgentTyping(false));
+      dispatch(enableSubmit(false));
       dispatch(appendToConversation(speaker, text))
-    }, 1000)
+    }, delay)
   }
 }
 
 function appendToConversation(speaker, text) {
-  // to mimic actual typing times, set a delay for a time based on the length of the response.
-  // let words = text.split(" ").length
-  // let delay = words/WPM * 60 * 1000
-
+  let answers = false
+  if (Array.isArray(text)) {
+    answers = true
+  }
   return {
     type: actionTypes.APPEND_TO_CONVERSATION,
     speaker,
     text,
-    timestamp: new Date().toDateString()
-  }
-
-  // console.log("APPENDING?");
-  // setTimeout(function() {
-    
-  // }, Math.floor(math))
-
-
-  
+    timestamp: new Date().toDateString(),
+    answers
+  }  
 }
 
-function getPath(state) {
+function getPath(state, chatInput) {
   let paths = state.questions[state.activeQuestionIndex].paths
   let pathType = Array.isArray(paths) ? 'array' : typeof paths
   switch (pathType) {
@@ -77,10 +79,19 @@ function getPath(state) {
     case 'number':
       return paths > 0 ? paths : 0
     case 'object':
-      const formattedInput = state.chatInput.toLowerCase()
+      const formattedInput = chatInput.toLowerCase()
       return paths[formattedInput] > 0 ? paths[formattedInput] : 0
   }
 }
+
+function setAgentTyping(value){
+  return {
+    type: actionTypes.SET_AGENT_TYPING,
+    value
+  }
+}
+
+
 
 /**
  * validAnswer() returns a boolean based on whether the current chatInput
@@ -131,36 +142,45 @@ function getHelperPrompt(state) {
         return `Your password should be at least six characters in length.`
       }
   } 
+}
 
+function agentResponse(answerIsValid, chatInput){
+  return function(dispatch, getState) {
+    dispatch(setAgentTyping(true))
+    const state = getState()
+    if (answerIsValid === true) {
+      let path = getPath(state, chatInput);
+      if (path != undefined) {
+        dispatch(setActiveQuestionIndex(path))
+        dispatch(nextQuestion(path))
+      } 
+    } else if (answerIsValid === false) {
+        // Invalid answer
+        const helperPrompt = getHelperPrompt(state)
+        dispatch(appendToConversation(state.doctor.name, helperPrompt, new Date().toDateString()))
+        dispatch(setAgentTyping(false))
+        
+    } else {
+        // handle terminal case
+    }
+  }
 }
 
 function validateInput(timestamp) {
-
-    return (dispatch, getState) => {
-      let state = getState()
-      dispatch(appendToConversation(state.user.name, state.chatInput, timestamp))
-      const answerIsValid = validAnswer(state)
-      if (answerIsValid === true) {
-        dispatch(setAnswerOnQuestion())
-        dispatch(updateInput(''))
-        let path = getPath(state);
-        if (path != undefined) {
-          dispatch(setActiveQuestionIndex(path))
-          dispatch(nextQuestion(path))
-        } else {
-          // TODO: handle endstate
-          debugger;
-        }
-      } else if (answerIsValid === false) {
-          // Invalid answer
-          const helperPrompt = getHelperPrompt(state)
-          dispatch(appendToConversation(state.doctor.name, helperPrompt, new Date().toDateString()))
-          dispatch(updateInput(''))
-      } else {
-          // handle terminal case
-      }
+  return (dispatch, getState) => {
+    const state = getState()
+    const chatInput = state.chatInput;
+    dispatch(disableSubmit());
+    dispatch(appendToConversation(state.user.name, state.chatInput, timestamp))
+    const answerIsValid = validAnswer(state)
+    if (answerIsValid) {
+      dispatch(setAnswerOnQuestion())
+      dispatch(updateInput(''))
     }
-
+    setTimeout(()=>{
+      dispatch(agentResponse(answerIsValid, chatInput))
+    }, Math.floor(Math.random() * Math.floor(1.5, 4) * 1000))
+  }
 }
 
 function disableSubmit() {
@@ -189,10 +209,39 @@ function getQuestions() {
   }
 }
 
+function formatResponses(answeredQuestions) {
+  let answers = []
+  for (var i = 0; i < answeredQuestions.length; i++) {
+    let item = answeredQuestions[i];
+    answers.push({
+      question: item.question,
+      answer: item.answer
+    })
+  }
+  return answers
+}
+
+
+function showResponses() {
+  return (dispatch, getState) => {
+    const state = getState();
+    
+    const answeredQuestions = state.questions.filter((item) => {
+      return !!item.answer
+    })
+
+    if (answeredQuestions.length) {
+      dispatch(appendToConversation(state.doctor.name, "Here's how you've answered the questions so far.", new Date().toDateString()))
+      dispatch(delayedAppend(state.doctor.name, formatResponses(answeredQuestions), new Date().toDateString()))
+    }
+  }
+}
+
 export {
   disableSubmit,
   enableSubmit,
   getQuestions,
+  showResponses,
   updateInput,
   validateInput
 }

@@ -1,11 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { disableSubmit, enableSubmit, updateInput, validateInput } from '../store/actions'
+import { disableSubmit, updateInput, validateInput } from '../store/actions'
 
 const mapChatInputState = state => {
+  let question = ''
+  if (state.questions.length && state.activeQuestionIndex) {
+    question = state.questions[state.activeQuestionIndex].question
+  }
   return {
-    chatInput: state.chatInput
+    chatInput: state.chatInput,
+    question
   }
 }
 
@@ -22,14 +27,16 @@ const mapChatInputDispatch = dispatch => {
   }
 }
 
-let ChatInput = ({ chatInput, handleInput, handleKeyPress }) => (
+let ChatInput = ({ chatInput, handleInput, handleKeyPress, question }) => (
   <input
+    type={ question.indexOf("password") > -1 ? 'password' : 'text'}
     value={chatInput}
     onChange={(event)=>handleInput(event.target.value)}
     onKeyPress={(event)=>handleKeyPress(event)}></input>
 )
 
 ChatInput.propTypes = {
+  question: PropTypes.string,
   chatInput: PropTypes.string,
   handleInput: PropTypes.func,
   handleKeyPress: PropTypes.func
@@ -37,14 +44,26 @@ ChatInput.propTypes = {
 
 ChatInput = connect(mapChatInputState, mapChatInputDispatch)(ChatInput)
 
-let ChatButton = ({ validateInput }) => (
-  <button onClick={()=>validateInput(new Date().toDateString())}>Send</button>
+let ChatButton = ({ validateInput, submitDisabled, chatInput }) => (
+  <button
+    onClick={()=>validateInput(new Date().toDateString())}
+    disabled={
+      submitDisabled || !chatInput
+    }>Send</button>
 )
 
 ChatButton.propTypes = {
-  validateInput: PropTypes.func
+  chatInput: PropTypes.string,
+  validateInput: PropTypes.func,
+  submitDisabled: PropTypes.bool
 }
 
+const mapChatButtonState = state => {
+  return {
+    submitDisabled: state.submitDisabled,
+    chatInput: state.chatInput
+  }
+}
 const mapChatButtonDispatch = dispatch => {
   return {
     validateInput: (timestamp) => {
@@ -53,7 +72,7 @@ const mapChatButtonDispatch = dispatch => {
   }
 }
 
-ChatButton = connect(null, mapChatButtonDispatch)(ChatButton)
+ChatButton = connect(mapChatButtonState, mapChatButtonDispatch)(ChatButton)
 
 const ChatBar = () => (
   <div>
