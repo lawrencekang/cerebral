@@ -4,6 +4,7 @@ Chat demo app for Cerebral.
 
 Uses webpack dev server for building the React + Redux app and serving the app locally.
 
+[App logic and additional information available here](client/src/store/README.md).
 
 `npm install`
 
