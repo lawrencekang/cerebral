@@ -7,6 +7,7 @@ const initialState = {
   conversation: [],
   agentTyping: false,
   submitDisabled: true,
+  showResponsesDisabled: true,
   user: {
     name: 'You',
     type: 'user'
@@ -72,6 +73,10 @@ export default function chatReducer(state = initialState, action) {
     case actionTypes.DISABLE_SUBMIT:
       return Object.assign({}, state, {
         submitDisabled: true
+      })
+    case actionTypes.ENABLE_SHOW_RESPONSES:
+      return Object.assign({}, state, {
+        showResponsesDisabled: false
       })
     default:
       return state

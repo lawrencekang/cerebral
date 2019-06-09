@@ -63,6 +63,12 @@ function enableSubmit() {
   }
 }
 
+function enableShowResponses() {
+  return {
+    type: actionTypes.ENABLE_SHOW_RESPONSES
+  }
+}
+
 // Thunks
 
 function delayedAppend(speaker, text, terminal) {
@@ -208,6 +214,9 @@ function validateInput(obscureText) {
     if (answerIsValid) {
       dispatch(setAnswerOnQuestion())
       dispatch(updateInput(''))
+      if (state.showResponsesDisabled) {
+        dispatch(enableShowResponses())
+      }
     } else {
       dispatch(updateInput(''))
     }

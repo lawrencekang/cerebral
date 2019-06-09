@@ -14,7 +14,8 @@ const store = configureStore();
 
 const mapStateToProps = state => {
   return {
-    agent: state.agent
+    agent: state.agent,
+    showResponsesDisabled: state.showResponsesDisabled
   }
 }
 
@@ -60,7 +61,7 @@ class ChatWrapper extends React.Component {
 
           <div className="row">
             <div className="stretch-button-wrapper col-3 offset-3">
-              <button className="stretch-button" onClick={() => this.props.triggerShowResponses()}>Show Responses</button>
+              <button disabled={this.props.showResponsesDisabled} className="stretch-button" onClick={() => this.props.triggerShowResponses()}>Show Responses</button>
             </div>
             <div className="stretch-button-wrapper col-3">
               <button className="stretch-button" onClick={() => this.props.triggerWebsocket()}>Connect to a Doctor</button>
@@ -75,7 +76,8 @@ class ChatWrapper extends React.Component {
 ChatWrapper.propTypes = {
   triggerShowResponses: PropTypes.func,
   triggerWebsocket: PropTypes.func,
-  agent: PropTypes.object
+  agent: PropTypes.object,
+  showResponsesDisabled: PropTypes.bool
 }
 
 ChatWrapper = connect(mapStateToProps, mapDispatchToProps)(ChatWrapper)
