@@ -1,5 +1,3 @@
-# Store:
-
 ## Actions and control flow
 In general the control flow works by:
 
