@@ -19,3 +19,5 @@ Testing - I opted for feature completion over testing, but would use Enzyme and 
 Further styling - I approximated the Cerebral brand colors and simplified the mock up of the Chat UI that was provided.
 
 Better validation - I would make the chat input validation more robust, including doing things like stripping out special characters (punctuation) to ensure better compatibility with how people type.
+
+Responsiveness - the app uses Bootstrap, but is not set up for all screen sizes and is optimized for higher-resolution displays.  
