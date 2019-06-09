@@ -48,12 +48,12 @@ class ChatWrapper extends React.Component {
         <div id='background-bottom'></div>
         <div className="container">
           <div id="logo" className="row">
-            <div className="logo-wrapper col-6 offset-3">
+            <div className="logo-wrapper col-lg-6 offset-lg-3 col-sm-10 offset-sm-1">
               <img src="https://static1.squarespace.com/static/5c146b54b27e39467e06d6a1/t/5cd39cd0e2c4831b196350b0/1558572162189/?format=1500w"></img>
             </div>
           </div>
           <div className="row">
-            <div id="chat-wrapper" className="col-6 offset-3">
+            <div id="chat-wrapper" className="col-lg-6 offset-lg-3 col-sm-10 offset-sm-1">
               <ChatWindow/>
               <ChatBar/>
             </div>
