@@ -1,27 +1,27 @@
 import * as actionTypes from './actionTypes';
 
 const initialState = {
-  questions: [],
   activeQuestionIndex: null,
-  chatInput: '',
-  conversation: [],
-  agentTyping: false,
-  submitDisabled: true,
-  showResponsesDisabled: true,
-  user: {
-    name: 'You',
-    type: 'user',
-  },
   agent: {
     name: 'Onboarding Agent',
     type: 'doctor',
   },
+  agentTyping: false,
+  chatInput: '',
+  conversation: [],
   invalidAnswerPrompts: [
     'I didn\'t quite get that.',
     'I\'m not sure sure I got that.',
     'Can you try again?',
     'Try your answer again.',
   ],
+  submitDisabled: true,
+  showResponsesDisabled: true,
+  questions: [],
+  user: {
+    name: 'You',
+    type: 'user',
+  },
 };
 
 export default function chatReducer(state = initialState, action) {
