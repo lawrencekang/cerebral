@@ -10,30 +10,30 @@ const initialState = {
   showResponsesDisabled: true,
   user: {
     name: 'You',
-    type: 'user'
+    type: 'user',
   },
   agent: {
     name: 'Onboarding Agent',
-    type: 'doctor'
+    type: 'doctor',
   },
   invalidAnswerPrompts: [
-    `I didn't quite get that.`,
-    `I'm not sure sure I got that.`,
-    `Can you try again?`,
-    `Try your answer again.`
-  ]
-}
+    'I didn\'t quite get that.',
+    'I\'m not sure sure I got that.',
+    'Can you try again?',
+    'Try your answer again.',
+  ],
+};
 
 export default function chatReducer(state = initialState, action) {
   switch (action.type) {
     case actionTypes.SET_ACTIVE_QUESTION_INDEX:
       return Object.assign({}, state, {
-        activeQuestionIndex: action.activeQuestionIndex
-      })
+        activeQuestionIndex: action.activeQuestionIndex,
+      });
     case actionTypes.RECEIVE_QUESTIONS:
       return Object.assign({}, state, {
-        questions: action.questions
-      })
+        questions: action.questions,
+      });
     case actionTypes.APPEND_TO_CONVERSATION:
       return Object.assign({}, state, {
         conversation: [
@@ -43,42 +43,42 @@ export default function chatReducer(state = initialState, action) {
             speakerType: action.speakerType,
             text: action.text,
             timestamp: action.timestamp,
-            answers: action.answers
-          }
-        ]
-      })
+            answers: action.answers,
+          },
+        ],
+      });
     case actionTypes.SET_CHAT_INPUT:
       return Object.assign({}, state, {
-        chatInput: action.chatInput
-      })
+        chatInput: action.chatInput,
+      });
     case actionTypes.SET_ANSWER_ON_QUESTION:
       return Object.assign({}, state, {
         questions: state.questions.map((question, index) => {
           if (index === state.activeQuestionIndex) {
             return Object.assign({}, question, {
-              answer: state.chatInput
-            })
+              answer: state.chatInput,
+            });
           }
-          return question
-        })
-      })
+          return question;
+        }),
+      });
     case actionTypes.SET_AGENT_TYPING:
       return Object.assign({}, state, {
-        agentTyping: action.value
-      })
+        agentTyping: action.value,
+      });
     case actionTypes.ENABLE_SUBMIT:
       return Object.assign({}, state, {
-        submitDisabled: false
-      })
+        submitDisabled: false,
+      });
     case actionTypes.DISABLE_SUBMIT:
       return Object.assign({}, state, {
-        submitDisabled: true
-      })
+        submitDisabled: true,
+      });
     case actionTypes.ENABLE_SHOW_RESPONSES:
       return Object.assign({}, state, {
-        showResponsesDisabled: false
-      })
+        showResponsesDisabled: false,
+      });
     default:
-      return state
+      return state;
   }
 }
