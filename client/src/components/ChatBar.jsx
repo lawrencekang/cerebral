@@ -16,12 +16,21 @@ const mapChatInputState = state => {
 
 const mapChatInputDispatch = dispatch => {
   return {
-    handleInput: inputValue => {
+    handleInput: event => {
+      // Passwords shouldn't be asked for in a chat app and put into a store without some sort of hashing; for demo purposes, the password is not hashed but is obscured.
+      let inputValue = event.target.value
+      if (event.target.getAttribute('type') === 'password') {
+        inputValue = inputValue.replace(/./g, '*')
+      }
       dispatch(updateInput(inputValue))},
     handleKeyPress: event => {
-      if (event.key=="Enter") {
+      if (event.key=='Enter') {
+        let obscureText = false;
+        if (event.target.getAttribute('type') === 'password'){
+          obscureText = true;  
+        }
         dispatch(disableSubmit())
-        dispatch(validateInput(null))
+        dispatch(validateInput(obscureText))
       }
     }
   }
@@ -31,7 +40,7 @@ let ChatInput = ({ chatInput, handleInput, handleKeyPress, question }) => (
   <input
     type={ question.indexOf("password") > -1 ? 'password' : 'text'}
     value={chatInput}
-    onChange={(event)=>handleInput(event.target.value)}
+    onChange={(event)=>handleInput(event)}
     onKeyPress={(event)=>handleKeyPress(event)}></input>
 )
 
@@ -66,8 +75,8 @@ const mapChatButtonState = state => {
 }
 const mapChatButtonDispatch = dispatch => {
   return {
-    validateInput: (timestamp) => {
-      dispatch(validateInput(timestamp))
+    validateInput: (obscureText) => {
+      dispatch(validateInput(obscureText))
     }
   }
 }

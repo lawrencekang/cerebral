@@ -16,7 +16,6 @@ const mapDispatchToProps = dispatch => {
     triggerShowResponses: () => {
       dispatch(showResponses())
     }
-
   }
 }
 

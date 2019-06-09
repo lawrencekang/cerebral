@@ -1,5 +1,5 @@
 {
-  "name": "travelogreact",
+  "name": "cerebral",
   "version": "0.0.1",
   "description": "React App and Webpack",
   "main": "client/app.js",
@@ -28,10 +28,15 @@
     "@babel/preset-env": "7.1.0",
     "@babel/preset-react": "7.0.0",
     "babel-loader": "8.0.4",
+    "bootstrap": "^4.3.1",
+    "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
+    "node-sass": "^4.12.0",
     "nodemon": "1.19.1",
     "redux-devtools-extension": "^2.13.8",
-    "webpack": "4.23.1",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.23.1",
     "webpack-cli": "3.1.2",
     "webpack-dev-server": "3.1.14"
   }

@@ -4,7 +4,9 @@ import { Provider, connect } from 'react-redux'
 import configureStore from './store/index'
 import ChatWindow from './components/ChatWindow.jsx'
 import ChatBar from './components/ChatBar.jsx'
-import { getQuestions } from './store/actions'
+import { appendToConversation, getQuestions } from './store/actions'
+import './styles/cerebralStyles.scss'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const store = configureStore();
 
@@ -13,14 +15,17 @@ class ChatWrapper extends React.Component {
     super(props);
   }
   componentDidMount() {
-    store.dispatch(getQuestions())
+    store.dispatch(appendToConversation(null, 'Hello!  Please give me a moment to set up.  In a moment, I\'ll be asking you a few questions to get you onboarded.', null))
+    setTimeout(()=> {
+      store.dispatch(getQuestions())
+    }, 5000)
   }
   render() {
     return (
-      <React.Fragment>
+      <div className="container">
         <ChatWindow/>
         <ChatBar/>
-      </React.Fragment>
+      </div>
     )
   }
 }

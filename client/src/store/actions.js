@@ -166,12 +166,15 @@ function agentResponse(answerIsValid, chatInput){
   }
 }
 
-function validateInput(timestamp) {
+function validateInput(obscureText) {
   return (dispatch, getState) => {
     const state = getState()
-    const chatInput = state.chatInput;
+    let chatInput = state.chatInput;
+    if (obscureText) {
+      chatInput = '(Hidden for your security).'
+    }
     dispatch(disableSubmit());
-    dispatch(appendToConversation(state.user.name, state.chatInput, timestamp))
+    dispatch(appendToConversation(state.user.name, chatInput, new Date().toDateString()))
     const answerIsValid = validAnswer(state)
     if (answerIsValid) {
       dispatch(setAnswerOnQuestion())
@@ -243,5 +246,6 @@ export {
   getQuestions,
   showResponses,
   updateInput,
-  validateInput
+  validateInput,
+  appendToConversation
 }
