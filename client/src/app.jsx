@@ -27,7 +27,6 @@ const mapDispatchToProps = dispatch => {
     triggerWebsocket: () => {
       dispatch(connectToWebsocket())
     }
-
   }
 }
 
@@ -58,7 +57,6 @@ class ChatWrapper extends React.Component {
               <ChatBar/>
             </div>
           </div>
-
           <div className="row">
             <div className="stretch-button-wrapper col-3 offset-3">
               <button disabled={this.props.showResponsesDisabled} className="stretch-button" onClick={() => this.props.triggerShowResponses()}>Show Responses</button>

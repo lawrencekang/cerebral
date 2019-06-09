@@ -31,8 +31,8 @@ class ChatWindow extends React.Component {
                   <div className={"chat-statement row" + (statement.speakerType == 'user' ? ' user-statement' : '')} key={index}>
                     <div className="col-12">
                       <div className="identifier">
-                          <span className="agent-name">{ statement.speaker }:</span>
-                          <span className="timestamp">{ statement.timestamp }</span>
+                          <span className="agent-name">{ statement.speaker }</span>
+                          <span className="timestamp">at { statement.timestamp }:</span>
                       </div>
                       <p>{ statement.text }</p>
                       

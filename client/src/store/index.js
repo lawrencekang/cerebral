@@ -9,7 +9,7 @@ export default function configureStore() {
     chatReducer,
     composeWithDevTools(
       applyMiddleware(
-        thunkMiddleware, // lets us dispatch() functions
+        thunkMiddleware
       )
     ) 
   )
