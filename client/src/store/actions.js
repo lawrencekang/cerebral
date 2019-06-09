@@ -60,11 +60,22 @@ function appendToConversation(speaker, text) {
   if (Array.isArray(text)) {
     answers = true
   }
+  let date = new Date()
+  let hours = date.getHours()
+  let minutes = date.getMinutes()
+  let z = "am"
+  if (hours > 12) {
+    hours -= 12
+    z = "pm"
+  }
+  if (minutes < 10) {
+    minutes = "0" + minutes
+  }
   return {
     type: actionTypes.APPEND_TO_CONVERSATION,
     speaker,
     text,
-    timestamp: new Date().toDateString(),
+    timestamp: `${hours}:${minutes} ${z}`,
     answers
   }  
 }
@@ -90,8 +101,6 @@ function setAgentTyping(value){
     value
   }
 }
-
-
 
 /**
  * validAnswer() returns a boolean based on whether the current chatInput
@@ -157,7 +166,7 @@ function agentResponse(answerIsValid, chatInput){
     } else if (answerIsValid === false) {
         // Invalid answer
         const helperPrompt = getHelperPrompt(state)
-        dispatch(appendToConversation(state.doctor.name, helperPrompt, new Date().toDateString()))
+        dispatch(appendToConversation(state.doctor.name, helperPrompt))
         dispatch(setAgentTyping(false))
         
     } else {
@@ -174,7 +183,7 @@ function validateInput(obscureText) {
       chatInput = '(Hidden for your security).'
     }
     dispatch(disableSubmit());
-    dispatch(appendToConversation(state.user.name, chatInput, new Date().toDateString()))
+    dispatch(appendToConversation(state.user.name, chatInput))
     const answerIsValid = validAnswer(state)
     if (answerIsValid) {
       dispatch(setAnswerOnQuestion())
@@ -224,18 +233,15 @@ function formatResponses(answeredQuestions) {
   return answers
 }
 
-
 function showResponses() {
   return (dispatch, getState) => {
     const state = getState();
-    
     const answeredQuestions = state.questions.filter((item) => {
       return !!item.answer
     })
-
     if (answeredQuestions.length) {
-      dispatch(appendToConversation(state.doctor.name, "Here's how you've answered the questions so far.", new Date().toDateString()))
-      dispatch(delayedAppend(state.doctor.name, formatResponses(answeredQuestions), new Date().toDateString()))
+      dispatch(appendToConversation(state.doctor.name, "Here's how you've answered the questions so far."))
+      dispatch(delayedAppend(state.doctor.name, formatResponses(answeredQuestions)))
     }
   }
 }

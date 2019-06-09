@@ -10,7 +10,8 @@ const mapChatInputState = state => {
   }
   return {
     chatInput: state.chatInput,
-    question
+    question,
+    submitDisabled: state.submitDisabled
   }
 }
 
@@ -23,7 +24,10 @@ const mapChatInputDispatch = dispatch => {
         inputValue = inputValue.replace(/./g, '*')
       }
       dispatch(updateInput(inputValue))},
-    handleKeyPress: event => {
+    handleKeyPress: (event, submitDisabled) => {
+      if (submitDisabled) {
+        return
+      }
       if (event.key=='Enter') {
         let obscureText = false;
         if (event.target.getAttribute('type') === 'password'){
@@ -36,25 +40,29 @@ const mapChatInputDispatch = dispatch => {
   }
 }
 
-let ChatInput = ({ chatInput, handleInput, handleKeyPress, question }) => (
+let ChatInput = ({ chatInput, handleInput, handleKeyPress, question, submitDisabled }) => (
   <input
+    placeholder="Type here..."
+    className="col-9"
     type={ question.indexOf("password") > -1 ? 'password' : 'text'}
     value={chatInput}
     onChange={(event)=>handleInput(event)}
-    onKeyPress={(event)=>handleKeyPress(event)}></input>
+    onKeyPress={(event)=>handleKeyPress(event, submitDisabled)}></input>
 )
 
 ChatInput.propTypes = {
   question: PropTypes.string,
   chatInput: PropTypes.string,
   handleInput: PropTypes.func,
-  handleKeyPress: PropTypes.func
+  handleKeyPress: PropTypes.func,
+  submitDisabled: PropTypes.bool
 }
 
 ChatInput = connect(mapChatInputState, mapChatInputDispatch)(ChatInput)
 
 let ChatButton = ({ validateInput, submitDisabled, chatInput }) => (
   <button
+    className="col-3"
     onClick={()=>validateInput(new Date().toDateString())}
     disabled={
       submitDisabled || !chatInput
@@ -84,7 +92,7 @@ const mapChatButtonDispatch = dispatch => {
 ChatButton = connect(mapChatButtonState, mapChatButtonDispatch)(ChatButton)
 
 const ChatBar = () => (
-  <div>
+  <div id="chat-bar" className="row">
     <ChatInput/><ChatButton/>
   </div>
 )

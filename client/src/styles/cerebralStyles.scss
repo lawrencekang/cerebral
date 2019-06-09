@@ -1,0 +1,52 @@
+#background-bottom {
+  background-color: #210540;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  margin-top: 400px;
+  transform: skewY(-4deg);
+}
+
+#background-top{
+  background-color: #EFF2FB;
+  position:fixed;
+  height: 500px;
+  width: 100%;
+}
+
+.container {
+  position: relative;
+}
+
+#chat-wrapper{
+  margin-top: 150px;
+  height: 450px;
+  background-color: #FFF;
+  position: relative;
+  
+  #conversation {
+    height: 365px;
+    overflow-y: auto;
+  }
+  .chat-statement{
+    word-wrap: normal;
+  }
+
+
+}
+
+#chat-bar{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 40px;
+  margin-right: 25px;
+  margin-left: 25px;
+  margin-bottom: 25px;
+
+  input {
+    line-height: 35px;
+    height: 35px;
+  }
+}
