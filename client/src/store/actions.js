@@ -273,7 +273,7 @@ function getQuestions() {
 
 function formatResponses(answeredQuestions) {
   const answers = [];
-  for (let i = 0; i < answeredQuestions.length; i + 1) {
+  for (let i = 0; i < answeredQuestions.length; i += 1) {
     const item = answeredQuestions[i];
     answers.push({
       question: item.question,
