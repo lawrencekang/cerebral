@@ -34,4 +34,5 @@ const mapChatButtonDispatch = dispatch => {
   }
 }
 
-export default ChatButton = connect(mapChatButtonState, mapChatButtonDispatch)(ChatButton)
+export default ChatButton = 
+  connect(mapChatButtonState, mapChatButtonDispatch)(ChatButton)

@@ -12,24 +12,6 @@ import { showResponses, connectToWebsocket } from './store/actions'
 
 const store = configureStore();
 
-const mapStateToProps = state => {
-  return {
-    agent: state.agent,
-    showResponsesDisabled: state.showResponsesDisabled
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    triggerShowResponses: () => {
-      dispatch(showResponses())
-    },
-    triggerWebsocket: () => {
-      dispatch(connectToWebsocket())
-    }
-  }
-}
-
 class ChatWrapper extends React.Component {
   constructor(props){
     super(props);
@@ -76,6 +58,24 @@ ChatWrapper.propTypes = {
   triggerWebsocket: PropTypes.func,
   agent: PropTypes.object,
   showResponsesDisabled: PropTypes.bool
+}
+
+const mapStateToProps = state => {
+  return {
+    agent: state.agent,
+    showResponsesDisabled: state.showResponsesDisabled
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    triggerShowResponses: () => {
+      dispatch(showResponses())
+    },
+    triggerWebsocket: () => {
+      dispatch(connectToWebsocket())
+    }
+  }
 }
 
 ChatWrapper = connect(mapStateToProps, mapDispatchToProps)(ChatWrapper)

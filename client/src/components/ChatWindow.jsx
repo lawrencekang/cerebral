@@ -9,6 +9,17 @@ const mapStateToProps = state => {
   }
 }
 
+/* 
+  ChatWindow uses a class component because of the need to hook into the 
+  componentDidUpdate lifecycle method.
+  
+  This component uses a ref to control an animation, which is an acceptable
+  use case per the React docs.
+
+  Rendering of normal chat statements vs. showing all previously answered
+  questions is handled together in this component, but could be broken out
+  into sub-components.
+*/
 class ChatWindow extends React.Component {
 
   constructor(props) {
@@ -28,11 +39,20 @@ class ChatWindow extends React.Component {
             {this.props.conversation.map((statement, index) => {
               if (statement.answers === false) {
                 return (
-                  <div className={"chat-statement row" + (statement.speakerType == 'user' ? ' user-statement' : '')} key={index}>
+                  <div 
+                    className={
+                      "chat-statement row" + 
+                      (statement.speakerType == 'user' ? ' user-statement' : '')
+                    } 
+                    key={index}>
                     <div className="col-12">
                       <div className="identifier">
-                          <span className="agent-name">{ statement.speaker }</span>
-                          <span className="timestamp">at { statement.timestamp }:</span>
+                          <span className="agent-name">
+                            { statement.speaker }
+                          </span>
+                          <span className="timestamp">
+                            at { statement.timestamp }:
+                          </span>
                       </div>
                       <p>{ statement.text }</p>
                       
@@ -45,14 +65,17 @@ class ChatWindow extends React.Component {
                     <div className={"chat-statement row"} key={index}>
                       <div className="col-12">
                         <p>Question: {answeredQuestion.question}</p>
-                        <p className="user-statement">Answer: {answeredQuestion.answer}</p>                    
+                        <p className="user-statement">
+                          Answer: {answeredQuestion.answer}
+                        </p>                    
                       </div>
                     </div>
                   )
                 }    
               )}
             })}
-            <div id="conversation-anchor" ref={this.conversationAnchorRef}></div>
+            <div id="conversation-anchor"
+              ref={this.conversationAnchorRef}></div>
           </div>
         </div>
       
@@ -63,7 +86,6 @@ class ChatWindow extends React.Component {
             }
           </div>
         </div>
-      
       </React.Fragment>
     )
   }

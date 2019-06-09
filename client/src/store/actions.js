@@ -4,7 +4,7 @@ import * as actionTypes from './actionTypes';
 
 const WPM = 60; // used to set delay on doctor 'typing'
 
-// Simple action creators
+// Simple action creator
 function setActiveQuestionIndex(activeQuestionIndex) {
   return {
     type: actionTypes.SET_ACTIVE_QUESTION_INDEX,
@@ -58,6 +58,11 @@ function enableShowResponses() {
 }
 
 // Thunks
+
+/*
+  appendToConversation controls all of the text that gets displayed in
+  the ChatWindow.
+*/
 function appendToConversation(speaker, text) {
   let answers = false;
   if (Array.isArray(text)) {
@@ -84,8 +89,12 @@ function appendToConversation(speaker, text) {
   };
 }
 
+/*
+  delayedAppend is not required for functionality, but simulates a delay before
+  displaying text in the ChatWindow, based on the time required for a user to
+  type.
+*/
 function delayedAppend(speaker, text, terminal) {
-  // to mimic actual typing times, set a delay for a time based on the length of the response.
   let delay = 1000;
   if (!Array.isArray(text)) {
     const words = text.split(' ').length;
@@ -120,7 +129,6 @@ function getPath(state, chatInput) {
   const pathType = Array.isArray(paths) ? 'array' : typeof paths;
   switch (pathType) {
     case 'undefined':
-      // not sure if this is ever used
       return undefined;
     case 'number':
       return paths > 0 ? paths : 0;
@@ -133,13 +141,14 @@ function getPath(state, chatInput) {
   }
 }
 
-/**
- * validAnswer() returns a boolean based on whether the current chatInput
- * passes the validation required in the current activeQuestion
- * TODO: replace special characters (e.g. punctuation) when validating against string values.
- */
+/*
+  validAnswer() returns a boolean based on whether the current chatInput
+  passes the validation required in the current activeQuestion
+  TODO: replace special characters (e.g. punctuation) when validating against
+  string values.
+*/
 function validAnswer(state) {
-  //  handle the case where we're using the "-1" question index
+  //  handle the case where were using the "-1" question index
   const activeQuestion = state.questions[state.activeQuestionIndex];
   const currentInput = state.chatInput;
   const { validation } = activeQuestion;
@@ -165,6 +174,10 @@ function validAnswer(state) {
   }
 }
 
+/*
+  getHelperPrompt is a helper method to make suggestions to the user when an
+  incorrect input is received.
+*/
 function getHelperPrompt(state) {
   const activeQuestion = state.questions[state.activeQuestionIndex];
   const { validation } = activeQuestion;
@@ -192,6 +205,10 @@ function getHelperPrompt(state) {
   }
 }
 
+/*
+  agentResponse controls the flow of the conversation, moving on to the next
+  question if a valid answer is received, and promting the user if not.
+*/
 function agentResponse(answerIsValid, chatInput) {
   return (dispatch, getState) => {
     dispatch(setAgentTyping(true));
@@ -239,7 +256,9 @@ function validateInput(obscureText) {
 
 function getQuestions() {
   return (dispatch) => {
-    const questionsUrl = 'https://gist.githubusercontent.com/pcperini/97fe41fc42ac1c610548cbfebb0a4b88/raw/cc07f09753ad8fefb308f5adae15bf82c7fffb72/cerebral_challenge.json';
+    const questionsUrl = 'https://gist.githubusercontent.com/pcperini/'
+    + '97fe41fc42ac1c610548cbfebb0a4b88/raw/'
+    + 'cc07f09753ad8fefb308f5adae15bf82c7fffb72/cerebral_challenge.json';
     return axios.get(questionsUrl)
       .then((response) => {
         dispatch(receiveQuestions(response.data));
@@ -269,7 +288,8 @@ function showResponses() {
     const state = getState();
     const answeredQuestions = state.questions.filter(item => !!item.answer);
     if (answeredQuestions.length) {
-      dispatch(appendToConversation(state.agent, "Here's how you've answered the questions so far."));
+      dispatch(appendToConversation(state.agent,
+        "Here's how you've answered the questions so far."));
       dispatch(delayedAppend(state.agent, formatResponses(answeredQuestions)));
     }
   };
