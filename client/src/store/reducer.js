@@ -8,11 +8,11 @@ const initialState = {
   agentTyping: false,
   submitDisabled: true,
   user: {
-    name: null,
+    name: 'You',
     type: 'user'
   },
-  doctor: {
-    name: 'Dr. Frontier',
+  agent: {
+    name: 'Onboarding Agent',
     type: 'doctor'
   },
   invalidAnswerPrompts: [
@@ -39,6 +39,7 @@ export default function chatReducer(state = initialState, action) {
           ...state.conversation,
           {
             speaker: action.speaker,
+            speakerType: action.speakerType,
             text: action.text,
             timestamp: action.timestamp,
             answers: action.answers

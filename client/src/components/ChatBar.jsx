@@ -62,6 +62,7 @@ ChatInput = connect(mapChatInputState, mapChatInputDispatch)(ChatInput)
 
 let ChatButton = ({ validateInput, submitDisabled, chatInput }) => (
   <button
+    id="chat-submit"
     className="col-3"
     onClick={()=>validateInput(new Date().toDateString())}
     disabled={

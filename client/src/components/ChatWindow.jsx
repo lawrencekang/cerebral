@@ -9,43 +9,72 @@ const mapStateToProps = state => {
   }
 }
 
-let ChatWindow = ({conversation, agentTyping, triggerShowResponses}) => (
-  <div id="conversation" className="row">
-    <div className="col-12">
-      {conversation.map((statement, index) => {
-        if (statement.answers === false) {
-          return (
-            <div className="chat-statement row" key={index}>
-              <div className="col-12">
-                <div>{ statement.speaker }</div>
-                <p>{ statement.text }</p>
-                <div>{ statement.timestamp }</div>
-              </div>
-            </div>
-            )
-        } else {
-          return statement.text.map((answeredQuestion, index) => {        
-            return (<div className="row" key={index}><span>{answeredQuestion.question}</span><span>{answeredQuestion.answer}</span></div>)
-            }
-          )
-          
-        }    
-      })}
-    </div>
+class ChatWindow extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.conversationAnchorRef = React.createRef();
+  }
+
+  componentDidUpdate(){
+    this.conversationAnchorRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+
+  render () {
+    return (  
+      <React.Fragment>
+        <div id="conversation" className="row">
+          <div className="col-12">
+            {this.props.conversation.map((statement, index) => {
+              if (statement.answers === false) {
+                return (
+                  <div className={"chat-statement row" + (statement.speakerType == 'user' ? ' user-statement' : '')} key={index}>
+                    <div className="col-12">
+                      <div className="identifier">
+                          <span className="agent-name">{ statement.speaker }:</span>
+                          <span className="timestamp">{ statement.timestamp }</span>
+                      </div>
+                      <p>{ statement.text }</p>
+                      
+                    </div>
+                  </div>
+                  )
+              } else {
+                return statement.text.map((answeredQuestion, index) => {        
+                  return (
+                    <div className={"chat-statement row"} key={index}>
+                      <div className="col-12">
+                        <p>Question: {answeredQuestion.question}</p>
+                        <p className="user-statement">Answer: {answeredQuestion.answer}</p>                    
+                      </div>
+                    </div>
+                  )
+                }    
+              )}
+            })}
+            <div id="conversation-anchor" ref={this.conversationAnchorRef}></div>
+          </div>
+        </div>
       
-    { agentTyping &&
-      <div className="agent-indicator row">
-        <p>The onboarding assistant is typing</p>
-      </div>
-    }
-    
-  </div>
-)
+        <div id="agent-indicator" className="row">
+          <div className="col-12">
+            { this.props.agentTyping &&
+                <p>The onboarding agent is typing</p>
+            }
+          </div>
+        </div>
+      
+      </React.Fragment>
+    )
+  }
+}
+
 
 ChatWindow.propTypes = {
   conversation: PropTypes.arrayOf(
     PropTypes.shape({
       speaker: PropTypes.string,
+      speakerType: PropTypes.string,
       text: PropTypes.oneOfType([PropTypes.string.isRequired,PropTypes.array]),
       timestamp: PropTypes.string,
       answers: PropTypes.boolean

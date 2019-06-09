@@ -1,5 +1,14 @@
+$cerebral-purple: #210540;
+$light-grey: #d3d3d3;
+
+#logo {
+  top: 125px;
+  text-align: center;
+  position:relative
+}
+
 #background-bottom {
-  background-color: #210540;
+  background-color: $cerebral-purple;
   position: fixed;
   height: 100%;
   width: 100%;
@@ -20,19 +29,56 @@
 
 #chat-wrapper{
   margin-top: 150px;
-  height: 450px;
+  height: 475px;
   background-color: #FFF;
   position: relative;
   
   #conversation {
     height: 365px;
     overflow-y: auto;
+    padding-top: 15px;
+
+    .identifier{
+      font-size: 16px;
+      
+    }
+
+    .agent-name {
+      color: $cerebral-purple;
+      font-weight: 600;
+    }
+
+    .timestamp {
+      color: $light-grey;
+      margin-left: 15px;
+    }
+
+    .user-statement {
+      text-align: right;
+
+      .agent-name {
+        color: #a505f5
+      }
+    }
+
+    .chat-statement{
+      max-width: 100%;
+
+      p {
+        word-wrap: break-word;
+      }
+    }
   }
+
+  #agent-indicator{
+    line-height: 25px;
+    height: 25px;
+    color: $light-grey;
+  }
+
   .chat-statement{
     word-wrap: normal;
   }
-
-
 }
 
 #chat-bar{
@@ -41,12 +87,23 @@
   right: 0;
   left: 0;
   height: 40px;
-  margin-right: 25px;
-  margin-left: 25px;
-  margin-bottom: 25px;
+  margin: 15px;
 
   input {
     line-height: 35px;
     height: 35px;
+  }
+
+  button#chat-submit{
+    height: 35px;
+  }
+}
+
+.stretch-button-wrapper{
+  padding-left:0px!important;
+  padding-right:0px!important;
+
+  button {
+    width: 100%;
   }
 }

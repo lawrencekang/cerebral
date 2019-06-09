@@ -8,7 +8,7 @@ function nextQuestion(activeQuestionIndex) {
     dispatch(setAgentTyping(true))
     let state = getState()
     let activeQuestion = state.questions[activeQuestionIndex]
-    dispatch(delayedAppend(state.doctor.name, activeQuestion.question, null))
+    dispatch(delayedAppend(state.agent, activeQuestion.question))
   }
 }
 
@@ -49,7 +49,7 @@ function delayedAppend(speaker, text) {
   return (dispatch) => {
     setTimeout(function() {
       dispatch(setAgentTyping(false));
-      dispatch(enableSubmit(false));
+      dispatch(enableSubmit());
       dispatch(appendToConversation(speaker, text))
     }, delay)
   }
@@ -73,7 +73,8 @@ function appendToConversation(speaker, text) {
   }
   return {
     type: actionTypes.APPEND_TO_CONVERSATION,
-    speaker,
+    speaker: speaker.name,
+    speakerType: speaker.type,
     text,
     timestamp: `${hours}:${minutes} ${z}`,
     answers
@@ -166,12 +167,10 @@ function agentResponse(answerIsValid, chatInput){
     } else if (answerIsValid === false) {
         // Invalid answer
         const helperPrompt = getHelperPrompt(state)
-        dispatch(appendToConversation(state.doctor.name, helperPrompt))
+        dispatch(appendToConversation(state.agent, helperPrompt))
+        dispatch(enableSubmit())
         dispatch(setAgentTyping(false))
-        
-    } else {
-        // handle terminal case
-    }
+    } 
   }
 }
 
@@ -183,10 +182,12 @@ function validateInput(obscureText) {
       chatInput = '(Hidden for your security).'
     }
     dispatch(disableSubmit());
-    dispatch(appendToConversation(state.user.name, chatInput))
+    dispatch(appendToConversation(state.user, chatInput))
     const answerIsValid = validAnswer(state)
     if (answerIsValid) {
       dispatch(setAnswerOnQuestion())
+      dispatch(updateInput(''))
+    } else {
       dispatch(updateInput(''))
     }
     setTimeout(()=>{
@@ -240,9 +241,18 @@ function showResponses() {
       return !!item.answer
     })
     if (answeredQuestions.length) {
-      dispatch(appendToConversation(state.doctor.name, "Here's how you've answered the questions so far."))
-      dispatch(delayedAppend(state.doctor.name, formatResponses(answeredQuestions)))
+      dispatch(appendToConversation(state.agent, "Here's how you've answered the questions so far."))
+      dispatch(delayedAppend(state.agent, formatResponses(answeredQuestions)))
     }
+  }
+}
+
+function connectToWebsocket() {
+  return (dispatch, getState) => {
+    const socket = new WebSocket('wss://echo.websocket.org');
+    socket.addEventListener('open', event => {
+      alert("Socket opened!")
+  });
   }
 }
 
@@ -253,5 +263,6 @@ export {
   showResponses,
   updateInput,
   validateInput,
-  appendToConversation
+  appendToConversation,
+  connectToWebsocket
 }
