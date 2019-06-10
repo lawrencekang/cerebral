@@ -245,11 +245,6 @@ function agentResponse(answerIsValid, chatInput) {
     const state = getState();
     if (answerIsValid === true) {
       dispatch(sendAnswer(chatInput));
-      // const path = getPath(state, chatInput);
-      // if (path !== undefined) {
-      //   dispatch(setActiveQuestionIndex(path));
-      //   dispatch(nextQuestion(path));
-      // }
     } else if (answerIsValid === false) {
       // Invalid answer, prompt user with hints
       const helperPrompt = getHelperPrompt(state);
