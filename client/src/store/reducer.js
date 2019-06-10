@@ -22,6 +22,7 @@ const initialState = {
     name: 'You',
     type: 'user',
   },
+  error: null,
 };
 
 export default function chatReducer(state = initialState, action) {
@@ -77,6 +78,10 @@ export default function chatReducer(state = initialState, action) {
     case actionTypes.ENABLE_SHOW_RESPONSES:
       return Object.assign({}, state, {
         showResponsesDisabled: false,
+      });
+    case actionTypes.SET_ERROR:
+      return Object.assign({}, state, {
+        error: action.error,
       });
     default:
       return state;
