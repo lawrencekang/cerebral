@@ -3,5 +3,5 @@ module.exports = {
   "globals": {
     WebSocket: true,
     alert: true
-  }
+  },
 };

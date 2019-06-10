@@ -57,6 +57,13 @@ function enableShowResponses() {
   };
 }
 
+function setError(error) {
+  return {
+    type: actionTypes.SET_ERROR,
+    error,
+  };
+}
+
 // Thunks
 
 /*
@@ -205,6 +212,29 @@ function getHelperPrompt(state) {
   }
 }
 
+function sendAnswer(chatInput) {
+  return (dispatch, getState) => {
+    const state = getState();
+    axios.put(`https://jsonplaceholder.typicode.com/posts/${state.activeQuestionIndex}`, {
+      answer: chatInput,
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          const path = getPath(state, chatInput);
+          if (path !== undefined) {
+            dispatch(setActiveQuestionIndex(path));
+            dispatch(nextQuestion(path));
+          }
+        }
+      })
+      .catch((error) => {
+        // TODO: decide how to handle the error here, with either a silent fail or a user alert.
+        dispatch(setError(error));
+      });
+  };
+}
+
+
 /*
   agentResponse controls the flow of the conversation, moving on to the next
   question if a valid answer is received, and promting the user if not.
@@ -214,11 +244,7 @@ function agentResponse(answerIsValid, chatInput) {
     dispatch(setAgentTyping(true));
     const state = getState();
     if (answerIsValid === true) {
-      const path = getPath(state, chatInput);
-      if (path !== undefined) {
-        dispatch(setActiveQuestionIndex(path));
-        dispatch(nextQuestion(path));
-      }
+      dispatch(sendAnswer(chatInput));
     } else if (answerIsValid === false) {
       // Invalid answer, prompt user with hints
       const helperPrompt = getHelperPrompt(state);
@@ -228,6 +254,7 @@ function agentResponse(answerIsValid, chatInput) {
     }
   };
 }
+
 
 function validateInput(obscureText) {
   return (dispatch, getState) => {
